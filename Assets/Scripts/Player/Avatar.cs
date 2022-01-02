@@ -44,20 +44,20 @@ public class Avatar : CharacterSkeleton {
 
     [Header("Movement")]
     public float jumpHeight = 20f;
-    [Range(.1f, 1.2f)] public    float   moveSpeed         = .1f;
-    private const            float   BaseGravity       = 20f;
-    public                   float   rotationAngle     = 0f;
-    public                   float   rotationSpeed     = .5f;
-    public                   float   rotationSpeedCap  = 2f;
-    private                  Vector3 moveDirection     = Vector3.zero;
-    [HideInInspector] public bool    didCast           = false;
-    [HideInInspector] public bool    didAct            = false;
-    [HideInInspector] public bool    isMoving          = false;
-    [HideInInspector] public float   maxVelocityChange = 2f;
-    [HideInInspector] public bool    canMove           = true;
-    [HideInInspector] public bool    canJump           = true;
-    [HideInInspector] public bool    isRunning         = false;
-    [HideInInspector] public bool    canCast           = true;
+    [Range(.1f, 1.2f)] public float   moveSpeed         = .1f;
+    private const             float   BaseGravity       = 20f;
+    public                    float   rotationAngle     = 0f;
+    public                    float   rotationSpeed     = .5f;
+    public                    float   rotationSpeedCap  = 2f;
+    private                   Vector3 moveDirection     = Vector3.zero;
+    [HideInInspector] public  bool    didCast           = false;
+    [HideInInspector] public  bool    didAct            = false;
+    [HideInInspector] public  bool    isMoving          = false;
+    [HideInInspector] public  float   maxVelocityChange = 2f;
+    [HideInInspector] public  bool    canMove           = true;
+    [HideInInspector] public  bool    canJump           = true;
+    [HideInInspector] public  bool    isRunning         = false;
+    [HideInInspector] public  bool    canCast           = true;
 
     private LayerMask LayerGround;
     private LayerMask LayerPlayer;
@@ -162,7 +162,6 @@ public class Avatar : CharacterSkeleton {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         Allocated = true;
-
     }
 
 
@@ -174,14 +173,17 @@ public class Avatar : CharacterSkeleton {
 
 
     void Update() {
+        if (!Allocated) { Initiate(); }
         PrimaryActionButtonState.EvaluateInput();
 
         animator.ResetTrigger("isJumping");
         TargetIndicator.transform.position = GetAimTargetPos();
         TargetIndicator.transform.LookAt(new Vector3(transform.position.x, transform.position.y, transform.position.z));
+        // aimPoint.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X"), 0);
+
         // Character rotation
         Vector3 currSpeed = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
-        
+
         CheckMoving();
         // currSpeed = canMove ? (isMoving ? currSpeed * moveSpeed : Vector3.zero) : Vector3.zero;
         animator.SetFloat("VelocityX", currSpeed.x, 0.1f, Time.deltaTime);
@@ -200,7 +202,7 @@ public class Avatar : CharacterSkeleton {
         if (canMove) {
             moveDirection = transform.forward * currSpeed.z + transform.right * currSpeed.x;
             agent.Move(moveDirection * moveSpeed);
-            
+
             rotationAngle += -Input.GetAxis("Mouse Y") * rotationSpeed;
             rotationAngle = Mathf.Clamp(rotationAngle, -rotationSpeed, rotationSpeedCap);
             playerCamera.transform.localRotation = Quaternion.Euler(rotationAngle, 0, 0);
@@ -414,7 +416,6 @@ public class Avatar : CharacterSkeleton {
         if (surfacePlane.Raycast(ray, out float enter)) {
             // Get point if clicked
             Vector3 hitPoint = ray.GetPoint(enter);
-            hitPoint.y += 1;
             return hitPoint;
         }
 
